@@ -1,4 +1,4 @@
-import masterController as master
+import mainController as master
 import homeScreen
 import constants
 
