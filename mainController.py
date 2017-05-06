@@ -4,19 +4,35 @@ import collections
 import time
 import math
 import threading
+import pickle
+import os
 import homeController
 import gameController
+import nameController
+import habitsController
 from enum import Enum
 import constants
 import systemState
 import user
 
 def main():
+    directory = os.path.dirname(os.path.abspath(__file__))
     state = systemState.SystemState()
+    # state.currentUser, state.userList, newUser = startup.getUser()
+    # if newUser:
+        # state.currentPage = constants.Page.ENTERNAME
+    # else:
+        # state.currentPage = constants.Page.HOME
+    
     motionThread = threading.Thread(target=motionTracking, args=(state,))
     logicThread = threading.Thread(target=changeData, args=(state,))
+    
     motionThread.start()
     logicThread.start()
+    motionThread.join()
+    logicThread.join()
+    
+    #pickle.dump(state.currentUser, open("users\\" + state.currentUser.name, 'wb'))
 
 def motionTracking(state):
     threadStart = time.time();
@@ -27,7 +43,7 @@ def motionTracking(state):
     prevX = -1
     prevY = -1
 
-    while(True):
+    while state.active:
         # Capture frame-by-frame
         ret, frame = cap.read()
         frame = cv2.flip(frame,1) # flips along y-axis
@@ -58,8 +74,8 @@ def motionTracking(state):
         setDirection(dx, dy, state)
         
         cv2.waitKey(1)
-        if time.time() - threadStart > 20: # quit with q
-            break
+        # if time.time() - threadStart > 30: # quit with q
+            # break
         time.sleep(1 / constants.FPS)
     #clean-up capture after completion
     cap.release()
@@ -68,7 +84,7 @@ def motionTracking(state):
 
 def changeData(state):
     threadStart = time.time()
-    while True:
+    while state.active:
         if state.currentPage == constants.Page.HOME:
             homeController.Control(state)
         elif state.currentPage == constants.Page.GAME:
@@ -77,18 +93,16 @@ def changeData(state):
             a = 0 # replace all a=0 lines with commented out controller lines
             #goto hiscoreController.Control(state)
         elif state.currentPage == constants.Page.HABITS:
-            a = 0
-            #goto habitsController.Control(state)
+            habitsController.Control(state)
         elif state.currentPage == constants.Page.ENTERNAME:
+            nameController.Control(state)
+        elif state.currentPage == constants.Page.CALIBRATE:
             a = 0
-            #goto nameController.Control(state)
-        elif state.currentPage == constants.Page.LOGIN:
-            a = 0
-            #goto loginController.Control(state)
+            #goto calibrateController.Control(state)
         
         cv2.waitKey(1)
-        if time.time() - threadStart > 20: # quit with q
-            break
+        # if time.time() - threadStart > 30: # quit with q
+            # break
         time.sleep(1 / constants.FPS)
     print("Logic thread complete")
 
