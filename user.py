@@ -1,6 +1,10 @@
+import datetime
+
 class User():
-    def __init__(self, name, image, gamePosition):
-        self.name = name
+    def __init__(self, image):
+        self.name = ""
         self.image = image
-        self.gamePosition = gamePosition
+        self.gamePosition = (0,0)
         self.highScore = 0
+        self.brushingTimes = {}
+        self.registerDate = datetime.date.today()
