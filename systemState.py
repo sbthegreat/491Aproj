@@ -1,14 +1,20 @@
 import constants
 import collections
+import user
+import datetime
 
 class SystemState():
     def __init__(self):
+        self.currentUser = user.User(None)
         self.trailPoints = collections.deque()
-        self.currentPage = constants.Page.HOME
+        self.currentPage = constants.Page.HABITS
         self.direction = constants.Direction.NONE 
         self.removedPoint = (0,0)
         self.lastSwipe = 0
-        self.userList = collections.deque()
+        self.userList = []
+        self.alphabetIndex = 0
+        self.selectedMonth = datetime.date.today().month
+        self.active = True
         
     def setPage(self, newPage):
         self.currentPage = newPage
