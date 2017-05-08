@@ -1,4 +1,3 @@
-import mainController as master
 import habitsScreen
 import constants
 import datetime

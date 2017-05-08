@@ -1,4 +1,3 @@
-import mainController as master
 import nameScreen
 import constants
 
@@ -14,5 +13,5 @@ def Control(state):
         state.alphabetIndex = (state.alphabetIndex - 1) % constants.ALPHA_SIZE
         state.resetDirection()
     elif state.direction == constants.Direction.DOWN:
-        state.setPage(constants.Page.HOME)
+        state.setPage(constants.Page.CALIBRATE)
         state.resetDirection()
