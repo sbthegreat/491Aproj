@@ -1,0 +1,50 @@
+# -*- coding: utf-8 -*-
+
+import face_recognition
+import cv2
+import os
+import pickle
+from models import user
+
+def getUser():
+    directory = os.path.dirname(os.path.abspath(__file__)) + "\\users"
+    userFiles = next(os.walk(directory))[2] # list of user files
+    userList = []
+    loadedEncodings = []
+
+    for userFile in userFiles:
+        file = open("users\\" + userFile,'rb')
+        loadedUser = pickle.load(file)
+        file.close()
+        
+        userList.append(loadedUser)
+        loadedImage = loadedUser.image
+        loadedEncodings.append(face_recognition.face_encodings(loadedImage)[0])
+
+    onScreenFaces = []
+    onScreenEncodings = []
+    processing = True
+
+    cap = cv2.VideoCapture(0)
+    while True:
+        ret, frame = cap.read()
+
+        small_frame = cv2.resize(frame, (0, 0), fx = 0.25, fy = 0.25)
+
+        # only process every other frame of video to save time
+        if processing:
+            onScreenFaces = face_recognition.face_locations(small_frame)
+            onScreenEncodings = face_recognition.face_encodings(small_frame, onScreenFaces)
+
+            if len(onScreenFaces) != 0:
+                for encoding in onScreenEncodings:
+                    match = face_recognition.compare_faces(loadedEncodings, encoding)
+                    
+                    for id in range(len(loadedEncodings)):
+                        if match[id].any(): # if any of the faces on screen match the loaded user's
+                            cap.release()
+                            return userList[id], userList, False
+                cap.release()
+                newUser = user.User(frame) # only reached if face on screen was not recognized
+                return newUser, userList, True
+        processing = not processing
