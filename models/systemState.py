@@ -22,6 +22,7 @@ class SystemState():
         self.curId = 0
         self.currentQuadrant = 0
         self.lastQuadrantTransition = 0
+        self.motionStart = (400,400)
         
     def setPage(self, newPage):
         self.currentPage = newPage
