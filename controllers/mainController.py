@@ -40,6 +40,7 @@ def motionTracking(state):
     currentY = -1
     prevX = -1
     prevY = -1
+    stopped = True
 
     while state.active:
         ret, frame = cap.read()
@@ -62,13 +63,33 @@ def motionTracking(state):
             currentY = int(moment01 / trackedArea)
         
         state.addPoint((currentX, currentY))
+        
+        if stopped:
+            dy = currentY - prevY
+            dx = currentX - prevX
+            length = math.hypot(dx, dy)
+            if length > 20: # 20 should be added to constants if this pans out
+                stopped = False
+        else: # if moving
+            stillPoints = 0
+            for id in range(len(state.trailPoints) - 1):
+                dy = state.trailPoints[id][1] - state.trailPoints[id + 1][1]
+                dx = state.trailPoints[id][0] - state.trailPoints[id + 1][0]
+                length = math.hypot(dx, dy)
+                if length < 20:
+                    stillPoints += 1
+            
+            dy = state.motionStart[1] - currentY
+            dx = state.motionStart[0] - currentX
+            length = math.hypot(dx, dy)
+            if length > constants.MIN_SWIPE:
+                setDirection(dx, dy, state)
+            if stillPoints >= 3: # 4 connections between 5 points, allow for one connection to be larger for stability
+                stopped = True
+                state.motionStart = (currentX, currentY)
+                
         prevX = currentX
         prevY = currentY
-
-        trailEnd = state.trailPoints[0]
-        dy = trailEnd[1] - currentY
-        dx = trailEnd[0] - currentX
-        setDirection(dx, dy, state)
         
         cv2.waitKey(1)
         time.sleep(1 / constants.FPS)
@@ -98,8 +119,8 @@ def changeData(state):
         time.sleep(1 / constants.FPS)
 
 def setDirection(dx, dy, state):
-    length = math.hypot(dx, dy)
-    if length > constants.MIN_SWIPE and time.time() > state.lastSwipe + constants.COOLDOWN: # direction is not modified if this is not satisfied
+        
+    if time.time() > state.lastSwipe + constants.COOLDOWN: # direction is not modified if this is not satisfied
         state.lastSwipe = time.time()
         if dx != 0:
             slope = dy / dx
@@ -125,7 +146,5 @@ def setDirection(dx, dy, state):
                 state.direction = constants.Direction.UP
             else:
                 state.direction = constants.Direction.DOWN
-
-
 
 if __name__ == '__main__': main()
