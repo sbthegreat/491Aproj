@@ -26,7 +26,7 @@ class Quadrant(IntEnum):
 TRAIL_COLOR = (255,0,0) # the BGR color of the trail following the tracked object during gameplay
 FPS = 60 # the FPS the game runs at
 POINT_LIMIT = 5; # the maximum number of points stored
-MIN_SWIPE = 150 # the minimum number of pixels the distance a swipe has to move before it is registered
+MIN_SWIPE = 130 # the minimum number of pixels the distance a swipe has to move before it is registered
 COOLDOWN = 0.5 # the number of seconds swipes are not tracked after a swipe occurs
 MIN_SIZE = 10000 # the smallest size a collection of thresholded pixels can be to register as a tracked object
 
@@ -48,8 +48,8 @@ ALPHA_SIZE = 26
 
 GAME_INCREMENT = 30 # how many pixels each swipes moves the game screen during calibration
 GAME_SIZE = 150 # how many pixels the radius of the game screen circle is
-GAME_LENGTH = 120 # how many seconds each game lasts for
-SECTION_LENGTH = 30
+GAME_LENGTH = 8 # how many seconds each game lasts for
+SECTION_LENGTH = 2
 
 GERM_COLORS = [(0,255,255),(0,128,255),(0,255,0)]
 GERM_SPEEDS = [4, 3, 2]
